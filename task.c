@@ -66,11 +66,60 @@ void freeList(Task** list_head) {
     Task* next_task;
 
     while (current != NULL) {
-        next_task = current->next; // Save the next node
-        free(current);             // Free the current node
-        current = next_task;       // Move to the next node
+        next_task = current->next;
+        free(current);
+        current = next_task;
     }
 
     // Set the original head pointer to NULL
     *list_head = NULL;
+}
+
+// Pushes a task onto the top of a stack.
+void push(Task** stack_top, Task* new_task) {
+    if (new_task == NULL) return;
+
+    // 1. Make the new task point to the current top
+    new_task->next = *stack_top;
+    
+    // 2. The new task is now the new top
+    *stack_top = new_task;
+}
+
+
+// Deletes a task by its 1-based index.
+Task* deleteTaskByIndex(Task** list_head, int index) {
+    if (*list_head == NULL || index < 1) {
+        return NULL;
+    }
+
+    Task* task_to_delete = NULL;
+
+    // Case 1: Deleting the head node
+    if (index == 1) {
+        task_to_delete = *list_head;
+        *list_head = (*list_head)->next;
+        task_to_delete->next = NULL;
+        return task_to_delete;
+    }
+
+    // Case 2: Deleting from middle or end
+    Task* current = *list_head;
+    int current_index = 1;
+
+    // Traverse to the node *before* the one to delete
+    while (current_index < index - 1 && current->next != NULL) {
+        current = current->next;
+        current_index++;
+    }
+
+    // Check if index is valid (i.e., we are at index-1 and next node exists)
+    if (current->next != NULL && current_index == index - 1) {
+        task_to_delete = current->next;
+        current->next = task_to_delete->next;
+        task_to_delete->next = NULL;
+        return task_to_delete;
+    }
+
+    return NULL;
 }

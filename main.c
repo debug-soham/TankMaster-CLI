@@ -33,9 +33,48 @@ void print_menu() {
     printf("| 1. Add New Task            |\n");
     printf("| 2. View Current Tasks      |\n");
     printf("| 3. Complete a Task         |\n");
-    printf("| 4. Exit                    |\n");
+    printf("| 4. View Completed History  |\n");
+    printf("| 5. Exit                    |\n");
     printf("|============================|\n");
     printf("\nEnter your choice: ");
+}
+
+// Helper function for the "Complete Task" workflow
+void complete_task_workflow(Task** high, Task** medium, Task** low, Task** completed_stack) {
+    printf("Which priority list to complete from? (1-High, 2-Medium, 3-Low): ");
+    int priority_choice = get_menu_choice();
+
+    Task** list_to_modify = NULL; // Pointer to the head pointer
+
+    if (priority_choice == 1)      list_to_modify = high;
+    else if (priority_choice == 2) list_to_modify = medium;
+    else if (priority_choice == 3) list_to_modify = low;
+    else {
+        printf("Invalid priority. Returning to menu.\n");
+        return;
+    }
+
+    if (*list_to_modify == NULL) {
+        printf("That list is empty. No tasks to complete.\n");
+        return;
+    }
+
+    printf("Enter the task number to complete: ");
+    int index_choice = get_menu_choice();
+    
+    if (index_choice < 1) {
+        printf("Invalid task number.\n");
+        return;
+    }
+
+    Task* completed_task = deleteTaskByIndex(list_to_modify, index_choice);
+
+    if (completed_task != NULL) {
+        push(completed_stack, completed_task);
+        printf("\nTask '%s' completed and moved to history!\n", completed_task->description);
+    } else {
+        printf("\nInvalid task number. Task not found.\n");
+    }
 }
 
 int main() {
@@ -43,6 +82,7 @@ int main() {
     Task* high_priority = NULL;
     Task* medium_priority = NULL;
     Task* low_priority = NULL;
+    Task* completed_tasks_stack = NULL;
     
     int running = 1;
     printf("\nWelcome to TaskMaster CLI!\n");
@@ -52,10 +92,8 @@ int main() {
         // 1. DISPLAY MENU
         print_menu();
 
-        // 2. GET USER INPUT
+        // 2. USER INPUT
         int choice = get_menu_choice();
-
-        // 3. PROCESS USER INPUT
         switch (choice) {
             case 1: // Add New Task
             {
@@ -97,15 +135,19 @@ int main() {
                 break;
 
             case 3: // Complete a Task
-                printf("This feature will be implemented soon!\n");
+                complete_task_workflow(&high_priority, &medium_priority, &low_priority, &completed_tasks_stack);
                 break;
 
-            case 4: // Exit
+            case 4: // View Completed History=
+                printTasks(completed_tasks_stack, "COMPLETED TASKS (Most Recent First)");
+                break;
+
+            case 5: // Exit
                 running = 0;
                 break;
 
             default:
-                printf("Invalid choice. Please enter a number between 1 and 4.\n");
+                printf("Invalid choice. Please enter a number between 1 and 5.\n");
                 break;
         }
     }
@@ -115,6 +157,7 @@ int main() {
     freeList(&high_priority);
     freeList(&medium_priority);
     freeList(&low_priority);
+    freeList(&completed_tasks_stack);
     printf("Cleanup complete. Goodbye!\n");
 
     return 0;

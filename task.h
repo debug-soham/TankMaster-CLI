@@ -20,11 +20,17 @@ typedef struct Task Task;
 // Creates a new task node
 Task* createTask(const char* description, int priority);
 
+// Deletes a task by its index
+Task* deleteTaskByIndex(Task** list_head, int index);
+
 // Adds a task to the end of a list
 void addTask(Task** list_head, Task* new_task);
 
 // Prints all tasks in a list
 void printTasks(Task* list_head, const char* title);
+
+// Pushes a task onto the top of a stack
+void push(Task** stack_top, Task* new_task);
 
 // Frees all nodes in a list
 void freeList(Task** list_head);
