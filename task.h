@@ -2,14 +2,14 @@
 #ifndef TASK_H
 #define TASK_H
 
-#include <stdlib.h> // For malloc(), free()
-#include <string.h> // For snprintf()
+#include <stdlib.h>
+#include <string.h>
 
 // The basic building block for a task
 struct Task {
     char description[256];
     int priority;
-    struct Task* next; // Pointer to the next task in a list
+    struct Task* next;
 };
 
 // Use 'Task' instead of 'struct Task'
@@ -34,5 +34,11 @@ void push(Task** stack_top, Task* new_task);
 
 // Frees all nodes in a list
 void freeList(Task** list_head);
+
+// Saves a given linked list to a file.
+void saveTasks(Task* list_head, const char* filename);
+
+// Loads tasks from a file into a given list.
+void loadTasks(Task** list_head, const char* filename);
 
 #endif // TASK_H

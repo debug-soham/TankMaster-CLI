@@ -3,3 +3,6 @@
 
 # Executable files
 *.exe
+
+# Data files
+*.dat

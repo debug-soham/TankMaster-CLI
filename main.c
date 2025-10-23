@@ -3,6 +3,12 @@
 #include <string.h>
 #include "task.h"
 
+// --- FILENAMES ---
+#define FILE_HIGH "tasks_high.dat"
+#define FILE_MEDIUM "tasks_medium.dat"
+#define FILE_LOW "tasks_low.dat"
+#define FILE_COMPLETED "tasks_completed.dat"
+
 // Helper function to safely read a line of text and remove the newline.
 void read_line(char* buffer, int size) {
     if (fgets(buffer, size, stdin)) {
@@ -83,6 +89,12 @@ int main() {
     Task* medium_priority = NULL;
     Task* low_priority = NULL;
     Task* completed_tasks_stack = NULL;
+
+    // --- LOAD TASKS ---
+    loadTasks(&high_priority, FILE_HIGH);
+    loadTasks(&medium_priority, FILE_MEDIUM);
+    loadTasks(&low_priority, FILE_LOW);
+    loadTasks(&completed_tasks_stack, FILE_COMPLETED);
     
     int running = 1;
     printf("\nWelcome to TaskMaster CLI!\n");
@@ -152,8 +164,14 @@ int main() {
         }
     }
 
-    // --- CLEANUP ---
-    printf("\nExiting. Cleaning up all lists...\n");
+    // --- SAVE & CLEANUP ---
+    printf("\nSaving tasks to file...\n");
+    saveTasks(high_priority, FILE_HIGH);
+    saveTasks(medium_priority, FILE_MEDIUM);
+    saveTasks(low_priority, FILE_LOW);
+    saveTasks(completed_tasks_stack, FILE_COMPLETED);
+
+    printf("Exiting. Cleaning up all lists...\n");
     freeList(&high_priority);
     freeList(&medium_priority);
     freeList(&low_priority);

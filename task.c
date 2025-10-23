@@ -123,3 +123,43 @@ Task* deleteTaskByIndex(Task** list_head, int index) {
 
     return NULL;
 }
+
+// Saves a given linked list to a file.
+void saveTasks(Task* list_head, const char* filename) {
+    FILE* file = fopen(filename, "w");
+    if (file == NULL) {
+        fprintf(stderr, "Error: Could not open file %s for writing.\n", filename);
+        return;
+    }
+
+    Task* current = list_head;
+    while (current != NULL) {
+        fprintf(file, "%d|%s\n", current->priority, current->description);
+        current = current->next;
+    }
+
+    fclose(file);
+}
+
+// Loads tasks from a file into a given list.
+void loadTasks(Task** list_head, const char* filename) {
+    FILE* file = fopen(filename, "r");
+    if (file == NULL) {
+        return; 
+    }
+
+    char line_buffer[512];
+    while (fgets(line_buffer, sizeof(line_buffer), file) != NULL) {
+        int priority;
+        char description[256];
+
+        if (sscanf(line_buffer, "%d|%255[^\n]", &priority, description) == 2) {
+            Task* newTask = createTask(description, priority);
+            if (newTask != NULL) {
+                addTask(list_head, newTask);
+            }
+        }
+    }
+
+    fclose(file);
+}
