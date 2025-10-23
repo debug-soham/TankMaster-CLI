@@ -1,4 +1,5 @@
 // main.c
+// Handles the main application loop and user interface (UI).
 #include <stdio.h>
 #include <string.h>
 #include "task.h"
@@ -9,17 +10,19 @@
 #define FILE_LOW "tasks_low.dat"
 #define FILE_COMPLETED "tasks_completed.dat"
 
-// Helper function to safely read a line of text and remove the newline.
+// Helper function to robustly read a line of text from stdin.
+// Fixes issues with newlines and input buffer errors.
 void read_line(char* buffer, int size) {
     if (fgets(buffer, size, stdin)) {
         buffer[strcspn(buffer, "\n")] = '\0';
     } else {
         buffer[0] = '\0'; 
-        clearerr(stdin); 
+        clearerr(stdin); // Reset error/EOF flag on stdin
     }
 }
 
-// Helper function to get a simple integer choice. Returns -1 on invalid input.
+// Helper function to get an integer choice from the user.
+// Uses read_line and sscanf to prevent infinite loops from bad input.
 int get_menu_choice() {
     char buffer[16];
     read_line(buffer, sizeof(buffer));
@@ -50,11 +53,14 @@ void complete_task_workflow(Task** high, Task** medium, Task** low, Task** compl
     printf("Which priority list to complete from? (1-High, 2-Medium, 3-Low): ");
     int priority_choice = get_menu_choice();
 
-    Task** list_to_modify = NULL; // Pointer to the head pointer
+    Task** list_to_modify = NULL; // Pointer to the list head
 
-    if (priority_choice == 1)      list_to_modify = high;
-    else if (priority_choice == 2) list_to_modify = medium;
-    else if (priority_choice == 3) list_to_modify = low;
+    if (priority_choice == 1)
+        list_to_modify = high;
+    else if (priority_choice == 2)
+        list_to_modify = medium;
+    else if (priority_choice == 3)
+        list_to_modify = low;
     else {
         printf("Invalid priority. Returning to menu.\n");
         return;
@@ -73,8 +79,10 @@ void complete_task_workflow(Task** high, Task** medium, Task** low, Task** compl
         return;
     }
 
+    // Attempt to remove the task from its list
     Task* completed_task = deleteTaskByIndex(list_to_modify, index_choice);
 
+    // If removal was successful, push it onto the history stack
     if (completed_task != NULL) {
         push(completed_stack, completed_task);
         printf("\nTask '%s' completed and moved to history!\n", completed_task->description);
@@ -91,6 +99,7 @@ int main() {
     Task* completed_tasks_stack = NULL;
 
     // --- LOAD TASKS ---
+    // Load all data from files on application start
     loadTasks(&high_priority, FILE_HIGH);
     loadTasks(&medium_priority, FILE_MEDIUM);
     loadTasks(&low_priority, FILE_LOW);
@@ -101,10 +110,8 @@ int main() {
 
     // --- MAIN APPLICATION LOOP ---
     while (running) {
-        // 1. DISPLAY MENU
         print_menu();
 
-        // 2. USER INPUT
         int choice = get_menu_choice();
         switch (choice) {
             case 1: // Add New Task
@@ -130,9 +137,12 @@ int main() {
 
                 Task* newTask = createTask(description, priority_choice);
                 if (newTask != NULL) {
-                    if (priority_choice == 1)      addTask(&high_priority, newTask);
-                    else if (priority_choice == 2) addTask(&medium_priority, newTask);
-                    else                           addTask(&low_priority, newTask);
+                    if (priority_choice == 1)
+                        addTask(&high_priority, newTask);
+                    else if (priority_choice == 2)
+                        addTask(&medium_priority, newTask);
+                    else
+                        addTask(&low_priority, newTask);
                     
                     printf("\nTask added successfully!\n");
                 }
