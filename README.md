@@ -1,6 +1,7 @@
 # TaskMaster CLI
 TaskMaster CLI is a command-line application for managing to-do items, built as a C project to demonstrate core data structures.
 
+### Demo Video
 https://github.com/user-attachments/assets/b7fccb56-21ae-4348-97a3-9da79328167e
 
 ## Features
